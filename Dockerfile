@@ -1,6 +1,9 @@
-FROM java:8-jre
-WORKDIR /usr/app
-ENV MYVAR=myvalue
-COPY ./target/demoapp-0.0.1-SNAPSHOT.jar /usr/app/demoapp-0.0.1-SNAPSHOT.jar
-RUN sh -c 'touch demoapp-0.0.1-SNAPSHOT.jar'
-ENTRYPOINT ["java","-jar","/usr/app/demoapp-0.0.1-SNAPSHOT.jar"]
+FROM adoptopenjdk/openjdk8-openj9
+RUN apt-get update && \
+    apt-get install -y maven
+WORKDIR /project
+COPY . /project
+RUN mvn -X initialize process-resources verify
+RUN mvn clean package
+#RUN mvn --version
+ENTRYPOINT ["java","-jar","/project/target/demoapp-0.0.1-SNAPSHOT.jar"]
